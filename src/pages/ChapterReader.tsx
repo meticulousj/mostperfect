@@ -1,7 +1,7 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Check, BookOpen } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, BookOpen, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useProgress } from "@/hooks/useProgress";
 import { getChapterById, getNextChapter, getPreviousChapter, getPartForChapter } from "@/data/bookContent";
@@ -111,6 +111,16 @@ const ChapterReader = () => {
               Great work! You've completed this chapter.
             </p>
           )}
+        </div>
+
+        {/* Get the Book CTA */}
+        <div className="mt-6 flex justify-center">
+          <Button asChild variant="outline" size="sm" className="gap-2">
+            <a href="https://www.barnesandnoble.com/w/most-perfect-jessica-butler/1148826487?ean=2940185038208" target="_blank" rel="noopener noreferrer">
+              <ExternalLink className="h-4 w-4" />
+              Get the Book
+            </a>
+          </Button>
         </div>
 
         {/* Navigation */}
