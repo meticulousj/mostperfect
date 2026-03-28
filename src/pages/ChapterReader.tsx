@@ -113,6 +113,16 @@ const ChapterReader = () => {
           )}
         </div>
 
+        {/* Get the Book CTA */}
+        <div className="mt-6 flex justify-center">
+          <Button asChild variant="outline" size="sm" className="gap-2">
+            <a href="https://www.barnesandnoble.com/w/most-perfect-jessica-butler/1148826487?ean=2940185038208" target="_blank" rel="noopener noreferrer">
+              <ExternalLink className="h-4 w-4" />
+              Get the Book
+            </a>
+          </Button>
+        </div>
+
         {/* Navigation */}
         <div className="mt-8 flex items-center justify-between gap-4">
           {prev ? (
