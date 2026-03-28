@@ -1,7 +1,7 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Check, BookOpen } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, BookOpen, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useProgress } from "@/hooks/useProgress";
 import { getChapterById, getNextChapter, getPreviousChapter, getPartForChapter } from "@/data/bookContent";
