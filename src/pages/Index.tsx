@@ -44,7 +44,19 @@ const Index = () => {
               <Button asChild size="lg" variant="secondary" className="gap-2">
                 <a href="https://www.barnesandnoble.com/w/most-perfect-jessica-butler/1148826487?ean=2940185038208" target="_blank" rel="noopener noreferrer">
                   <BookOpen className="h-4 w-4" />
-                  Get the Book
+                  Barnes &amp; Noble
+                </a>
+              </Button>
+              <Button asChild size="lg" variant="secondary" className="gap-2">
+                <a href="https://books2read.com/b/bOMDpK" target="_blank" rel="noopener noreferrer">
+                  <BookOpen className="h-4 w-4" />
+                  Books2Read
+                </a>
+              </Button>
+              <Button asChild size="lg" variant="secondary" className="gap-2">
+                <a href="https://ocebook.com/book/197273/most-perfect-above-human-proven-and-verified-claim-your-ultimate-standard" target="_blank" rel="noopener noreferrer">
+                  <BookOpen className="h-4 w-4" />
+                  OCEBook
                 </a>
               </Button>
               <Button asChild variant="outline" size="lg">
