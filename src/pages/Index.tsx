@@ -47,6 +47,12 @@ const Index = () => {
                   Get the Book
                 </a>
               </Button>
+              <Button asChild size="lg" variant="secondary" className="gap-2">
+                <a href="https://www.barnesandnoble.com/w/most-perfect-jessica-butler/1148826487?ean=2940185038208" target="_blank" rel="noopener noreferrer">
+                  <BookOpen className="h-4 w-4" />
+                  Barnes &amp; Noble
+                </a>
+              </Button>
               <Button asChild variant="outline" size="lg">
                 <Link to="/course">View Course Map</Link>
               </Button>
