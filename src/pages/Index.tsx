@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, BookOpen, ChevronRight } from "lucide-react";
+import { ArrowRight, BookOpen, ChevronRight, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useProgress } from "@/hooks/useProgress";
@@ -63,6 +63,12 @@ const Index = () => {
                 <a href="https://ocebook.com/book/197273/most-perfect-above-human-proven-and-verified-claim-your-ultimate-standard" target="_blank" rel="noopener noreferrer">
                   <BookOpen className="h-4 w-4" />
                   OceBook
+                </a>
+              </Button>
+              <Button asChild size="lg" variant="secondary" className="gap-2">
+                <a href="https://freethinkinggenius.substack.com/s/" target="_blank" rel="noopener noreferrer">
+                  <Mail className="h-4 w-4" />
+                  Newsletter
                 </a>
               </Button>
               <Button asChild variant="outline" size="lg">
