@@ -1,7 +1,7 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Check, BookOpen, ExternalLink } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, BookOpen, ExternalLink, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useProgress } from "@/hooks/useProgress";
 import { getChapterById, getNextChapter, getPreviousChapter, getPartForChapter } from "@/data/bookContent";
@@ -137,6 +137,12 @@ const ChapterReader = () => {
             <a href="https://ocebook.com/book/197273/most-perfect-above-human-proven-and-verified-claim-your-ultimate-standard" target="_blank" rel="noopener noreferrer">
               <ExternalLink className="h-4 w-4" />
               OceBook
+            </a>
+          </Button>
+          <Button asChild variant="outline" size="sm" className="gap-2">
+            <a href="https://freethinkinggenius.substack.com/s/" target="_blank" rel="noopener noreferrer">
+              <Mail className="h-4 w-4" />
+              Newsletter
             </a>
           </Button>
         </div>

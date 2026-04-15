@@ -65,6 +65,12 @@ const Index = () => {
                   OceBook
                 </a>
               </Button>
+              <Button asChild size="lg" variant="secondary" className="gap-2">
+                <a href="https://freethinkinggenius.substack.com/s/" target="_blank" rel="noopener noreferrer">
+                  <Mail className="h-4 w-4" />
+                  Newsletter
+                </a>
+              </Button>
               <Button asChild variant="outline" size="lg">
                 <Link to="/course">View Course Map</Link>
               </Button>
