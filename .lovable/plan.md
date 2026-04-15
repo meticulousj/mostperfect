@@ -1,17 +1,12 @@
 
 
-## Add All Book Purchase Links
+## Add Newsletter Link
 
-Update the home page and chapter reader to show three purchase CTAs: Amazon, Books2Read, and Barnes & Noble (keeping existing), plus OceBook.
+Add a Substack newsletter CTA to the home page and chapter reader, alongside the existing book purchase buttons.
 
 ### Changes
 
-**`src/pages/Index.tsx`** — Hero section buttons:
-- Keep existing "Get the Book" (Books2Read) and "Barnes & Noble" buttons
-- Add "Amazon" button linking to `https://a.co/d/c7pVxkb`
-- Add "OceBook" button linking to the OceBook URL
-- Reorder: Amazon first, then Books2Read, Barnes & Noble, OceBook
+1. **`src/pages/Index.tsx`** — Add a "Newsletter" button in the hero section's button group, linking to `https://freethinkinggenius.substack.com/s/` with a `Mail` icon from lucide-react.
 
-**`src/pages/ChapterReader.tsx`** — Footer CTA section:
-- Same four purchase buttons with `ExternalLink` icons in a flex-wrap container
+2. **`src/pages/ChapterReader.tsx`** — Add a matching "Newsletter" button in the footer CTA section alongside the book purchase links.
 
