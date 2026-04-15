@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, BookOpen, ChevronRight, Mail } from "lucide-react";
+import { ArrowRight, BookOpen, ChevronRight, Mail, Download, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useProgress } from "@/hooks/useProgress";
@@ -66,9 +66,9 @@ const Index = () => {
                 </a>
               </Button>
               <Button asChild size="lg" variant="secondary" className="gap-2">
-                <a href="https://freethinkinggenius.substack.com/s/" target="_blank" rel="noopener noreferrer">
+                <a href="https://freethinkinggenius.substack.com/s/thestandard" target="_blank" rel="noopener noreferrer">
                   <Mail className="h-4 w-4" />
-                  Newsletter
+                  The Standard
                 </a>
               </Button>
               <Button asChild variant="outline" size="lg">
@@ -125,6 +125,57 @@ const Index = () => {
               </Link>
             </motion.div>
           ))}
+        </div>
+      </section>
+
+      {/* Newsletter — The Standard */}
+      <section className="border-t bg-primary/5">
+        <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex flex-col items-center text-center"
+          >
+            <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-primary">
+              Newsletter
+            </p>
+            <h2 className="font-serif text-3xl font-bold text-foreground sm:text-4xl">
+              The Standard
+            </h2>
+            <p className="mt-3 max-w-xl text-base leading-relaxed text-muted-foreground">
+              A newsletter about living a life that is Most Perfect, Above Human, Proven, and Verified.
+            </p>
+
+            <div className="mt-8 grid gap-6 sm:grid-cols-2 max-w-2xl w-full">
+              <div className="rounded-lg border bg-card p-6 text-left">
+                <Sparkles className="h-5 w-5 text-primary mb-3" />
+                <h3 className="font-serif text-lg font-semibold text-card-foreground">
+                  Support Above Human Innovation
+                </h3>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Support Verified Brilliance.
+                </p>
+              </div>
+              <div className="rounded-lg border bg-card p-6 text-left">
+                <Download className="h-5 w-5 text-primary mb-3" />
+                <h3 className="font-serif text-lg font-semibold text-card-foreground">
+                  Access the Free Book
+                </h3>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Download the book and engage with the framework. No gimmicks. No urgency pressure. Just verified thinking—made accessible.
+                </p>
+              </div>
+            </div>
+
+            <Button asChild size="lg" className="mt-8 gap-2">
+              <a href="https://freethinkinggenius.substack.com/s/thestandard" target="_blank" rel="noopener noreferrer">
+                <Mail className="h-4 w-4" />
+                Subscribe to The Standard
+                <ArrowRight className="h-4 w-4" />
+              </a>
+            </Button>
+          </motion.div>
         </div>
       </section>
 

@@ -140,9 +140,9 @@ const ChapterReader = () => {
             </a>
           </Button>
           <Button asChild variant="outline" size="sm" className="gap-2">
-            <a href="https://freethinkinggenius.substack.com/s/" target="_blank" rel="noopener noreferrer">
+            <a href="https://freethinkinggenius.substack.com/s/thestandard" target="_blank" rel="noopener noreferrer">
               <Mail className="h-4 w-4" />
-              Newsletter
+              The Standard
             </a>
           </Button>
         </div>
