@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { BookOpen, LayoutGrid, BarChart3, Lightbulb, Menu, X } from "lucide-react";
+import { BookOpen, LayoutGrid, BarChart3, Lightbulb, PenLine, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -8,6 +8,7 @@ const navItems = [
   { to: "/course", label: "Course", icon: LayoutGrid },
   { to: "/progress", label: "Progress", icon: BarChart3 },
   { to: "/concepts", label: "Key Concepts", icon: Lightbulb },
+  { to: "/authors-note", label: "Author's Note", icon: PenLine },
 ];
 
 const AppNav = () => {
