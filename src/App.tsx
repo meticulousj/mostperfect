@@ -10,6 +10,7 @@ import ChapterReader from "./pages/ChapterReader.tsx";
 import ProgressDashboard from "./pages/ProgressDashboard.tsx";
 import KeyConcepts from "./pages/KeyConcepts.tsx";
 import AuthorsNote from "./pages/AuthorsNote.tsx";
+import Workbooks from "./pages/Workbooks.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/progress" element={<ProgressDashboard />} />
           <Route path="/concepts" element={<KeyConcepts />} />
           <Route path="/authors-note" element={<AuthorsNote />} />
+          <Route path="/workbooks" element={<Workbooks />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
