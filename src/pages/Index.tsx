@@ -71,6 +71,12 @@ const Index = () => {
                   The Standard
                 </a>
               </Button>
+              <Button asChild size="lg" variant="secondary" className="gap-2">
+                <a href="/Verification_Blueprint.pdf" download>
+                  <Download className="h-4 w-4" />
+                  Verification Blueprint
+                </a>
+              </Button>
               <Button asChild variant="outline" size="lg">
                 <Link to="/course">View Course Map</Link>
               </Button>
