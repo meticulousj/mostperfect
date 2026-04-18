@@ -77,6 +77,12 @@ const Index = () => {
                   Verification Blueprint
                 </a>
               </Button>
+              <Button asChild size="lg" variant="secondary" className="gap-2">
+                <Link to="/workbooks">
+                  <Download className="h-4 w-4" />
+                  Premium Workbooks
+                </Link>
+              </Button>
               <Button asChild variant="outline" size="lg">
                 <Link to="/course">View Course Map</Link>
               </Button>
