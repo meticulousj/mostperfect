@@ -25,8 +25,9 @@ export const PROLOGUE: Chapter = {
   description: "A call to rise beyond comfort and into alignment with your highest self.",
   keyQuote: "You are not being asked to be flawless. You are being asked to rise.",
   content: [
-    "But you didn’t. You couldn’t. You wouldn’t.",
-    "There is a part of you that knows the truth:",
+    "THE GOAL IS PERFECTION",
+    "Perfection is not a destination; it is a direction. Mediocrity is not a virtue. It is a surrender. Lowering your expectations does not give you a better life; it simply gives you a smaller life. It shrinks your world to fit your current comfort zone.",
+    "The goal is perfection. Not as a final resting place, but as a relentless, driving force.",
     "Not to perfection as society defines it,",
     "but to Most Perfect—the highest standard a human being can hold without collapsing under ego or illusion.",
     "but to Above Human—a disciplined way of perceiving, thinking, choosing, and acting that transcends the default settings of fear, bias, emotional volatility, and self-deception.",
