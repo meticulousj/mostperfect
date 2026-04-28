@@ -1,7 +1,8 @@
 import { Link, useLocation } from "react-router-dom";
-import { BookOpen, LayoutGrid, BarChart3, Lightbulb, PenLine, FileText, Menu, X } from "lucide-react";
-import { useState } from "react";
+import { BookOpen, LayoutGrid, BarChart3, Lightbulb, PenLine, FileText, Menu, X, Moon, Sun } from "lucide-react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { Switch } from "@/components/ui/switch";
 
 const navItems = [
   { to: "/", label: "Home", icon: BookOpen },
@@ -15,6 +16,27 @@ const navItems = [
 const AppNav = () => {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isDark, setIsDark] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("theme") === "dark";
+  });
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", isDark);
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+  }, [isDark]);
+
+  const themeToggle = (
+    <div className="flex items-center gap-2 rounded-md px-2 py-1.5 text-muted-foreground">
+      <Sun className="h-4 w-4" aria-hidden="true" />
+      <Switch
+        checked={isDark}
+        onCheckedChange={setIsDark}
+        aria-label="Toggle dark mode"
+      />
+      <Moon className="h-4 w-4" aria-hidden="true" />
+    </div>
+  );
 
   return (
     <nav className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
@@ -42,6 +64,7 @@ const AppNav = () => {
               {label}
             </Link>
           ))}
+          {themeToggle}
         </div>
 
         {/* Mobile toggle */}
@@ -72,6 +95,7 @@ const AppNav = () => {
               {label}
             </Link>
           ))}
+          <div className="mt-2 border-t pt-3">{themeToggle}</div>
         </div>
       )}
     </nav>
