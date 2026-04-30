@@ -1,11 +1,13 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Check, ChevronDown, BookOpen } from "lucide-react";
+import { Check, BookOpen, Search } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
 import { useProgress } from "@/hooks/useProgress";
 import { bookParts, PROLOGUE, EPILOGUE } from "@/data/bookContent";
 import { cn } from "@/lib/utils";
+import { openGlobalSearch } from "@/components/GlobalSearch";
 
 const CourseOverview = () => {
   const { isCompleted, getPartProgress } = useProgress();
@@ -13,10 +15,18 @@ const CourseOverview = () => {
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="font-serif text-3xl font-bold text-foreground">Course Overview</h1>
-        <p className="mt-2 text-muted-foreground">
-          Navigate through all 6 parts and 29 chapters of your journey.
-        </p>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h1 className="font-serif text-3xl font-bold text-foreground">Course Overview</h1>
+            <p className="mt-2 text-muted-foreground">
+              Navigate through all 6 parts and 29 chapters of your journey.
+            </p>
+          </div>
+          <Button variant="outline" onClick={openGlobalSearch} className="w-full gap-2 sm:w-auto">
+            <Search className="h-4 w-4" />
+            Search chapters
+          </Button>
+        </div>
       </motion.div>
 
       {/* Prologue */}
