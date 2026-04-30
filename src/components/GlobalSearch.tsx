@@ -62,7 +62,7 @@ const GlobalSearch = () => {
   }, [open]);
 
   return (
-    <CommandDialog open={open} onOpenChange={setOpen}>
+    <CommandDialog open={open} onOpenChange={setOpen} commandProps={{ shouldFilter: false }}>
       <CommandInput
         value={query}
         onValueChange={setQuery}
@@ -83,7 +83,7 @@ const GlobalSearch = () => {
             {results.map(({ chapter, sectionLabel, matchType, snippet }) => (
               <CommandItem
                 key={chapter.id}
-                value={chapter.id}
+                value={`${chapter.id} ${chapter.title} ${sectionLabel} ${snippet}`}
                 onSelect={() => {
                   setOpen(false);
                   navigate(`/read/${chapter.id}`);
