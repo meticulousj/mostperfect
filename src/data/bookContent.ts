@@ -1132,3 +1132,79 @@ export const getPreviousChapter = (currentId: string): Chapter | undefined => {
 
 export const getPartForChapter = (chapterId: string): Part | undefined =>
   bookParts.find((part) => part.chapters.some((ch) => ch.id === chapterId));
+
+export interface ChapterSearchResult {
+  chapter: Chapter;
+  sectionLabel: string;
+  matchType: "title" | "description" | "section" | "content";
+  snippet: string;
+  score: number;
+}
+
+const normalizeSearchText = (value: string) =>
+  value
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+const getSectionLabelForChapter = (chapter: Chapter) => {
+  if (chapter.id === "prologue") return "Prologue";
+  if (chapter.id === "epilogue") return "Epilogue";
+  const part = getPartForChapter(chapter.id);
+  return part ? `Part ${part.number} — ${part.title}` : "Most Perfect";
+};
+
+const createSnippet = (chapter: Chapter, query: string) => {
+  const normalizedQuery = normalizeSearchText(query);
+  const matchedParagraph = chapter.content.find((paragraph) =>
+    normalizeSearchText(paragraph).includes(normalizedQuery)
+  );
+
+  if (!matchedParagraph) return chapter.description;
+
+  const lowerParagraph = matchedParagraph.toLowerCase();
+  const lowerQuery = query.toLowerCase();
+  const matchIndex = lowerParagraph.indexOf(lowerQuery);
+  const approximateIndex = matchIndex >= 0 ? matchIndex : 0;
+  const start = Math.max(0, approximateIndex - 80);
+  const end = Math.min(matchedParagraph.length, approximateIndex + query.length + 140);
+  const prefix = start > 0 ? "…" : "";
+  const suffix = end < matchedParagraph.length ? "…" : "";
+
+  return `${prefix}${matchedParagraph.slice(start, end).trim()}${suffix}`;
+};
+
+export const searchChapters = (query: string, limit = 20): ChapterSearchResult[] => {
+  const normalizedQuery = normalizeSearchText(query);
+  if (normalizedQuery.length < 2) return [];
+
+  return allChapters
+    .map((chapter) => {
+      const sectionLabel = getSectionLabelForChapter(chapter);
+      const title = normalizeSearchText(chapter.title);
+      const description = normalizeSearchText(chapter.description);
+      const section = normalizeSearchText(sectionLabel);
+      const content = normalizeSearchText(chapter.content.join(" "));
+
+      if (title.includes(normalizedQuery)) {
+        return { chapter, sectionLabel, matchType: "title" as const, snippet: chapter.description, score: 400 };
+      }
+      if (description.includes(normalizedQuery)) {
+        return { chapter, sectionLabel, matchType: "description" as const, snippet: chapter.description, score: 300 };
+      }
+      if (section.includes(normalizedQuery)) {
+        return { chapter, sectionLabel, matchType: "section" as const, snippet: chapter.description, score: 200 };
+      }
+      if (content.includes(normalizedQuery)) {
+        return { chapter, sectionLabel, matchType: "content" as const, snippet: createSnippet(chapter, query), score: 100 };
+      }
+
+      return null;
+    })
+    .filter((result): result is ChapterSearchResult => Boolean(result))
+    .sort((a, b) => b.score - a.score || allChapters.indexOf(a.chapter) - allChapters.indexOf(b.chapter))
+    .slice(0, limit);
+};

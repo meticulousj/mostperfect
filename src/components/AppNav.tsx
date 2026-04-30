@@ -1,8 +1,10 @@
 import { Link, useLocation } from "react-router-dom";
-import { BookOpen, LayoutGrid, BarChart3, Lightbulb, PenLine, FileText, Menu, X, Moon, Sun } from "lucide-react";
+import { BookOpen, LayoutGrid, BarChart3, Lightbulb, PenLine, FileText, Menu, X, Moon, Sun, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
+import { openGlobalSearch } from "@/components/GlobalSearch";
 
 const navItems = [
   { to: "/", label: "Home", icon: BookOpen },
@@ -64,6 +66,10 @@ const AppNav = () => {
               {label}
             </Link>
           ))}
+          <Button variant="ghost" size="sm" onClick={openGlobalSearch} className="gap-1.5 text-muted-foreground hover:text-accent-foreground">
+            <Search className="h-4 w-4" />
+            Search
+          </Button>
           {themeToggle}
         </div>
 
@@ -95,6 +101,16 @@ const AppNav = () => {
               {label}
             </Link>
           ))}
+          <button
+            onClick={() => {
+              setMobileOpen(false);
+              openGlobalSearch();
+            }}
+            className="flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+          >
+            <Search className="h-4 w-4" />
+            Search
+          </button>
           <div className="mt-2 border-t pt-3">{themeToggle}</div>
         </div>
       )}
