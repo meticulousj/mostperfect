@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useProgress } from "@/hooks/useProgress";
 import { getChapterById, getNextChapter, getPreviousChapter, getPartForChapter } from "@/data/bookContent";
 import { cn } from "@/lib/utils";
+import ReflectionPrompts from "@/components/ReflectionPrompts";
 
 const ChapterReader = () => {
   const { chapterId } = useParams<{ chapterId: string }>();
@@ -94,6 +95,9 @@ const ChapterReader = () => {
             </p>
           ))}
         </article>
+
+        {/* Reflection Prompts */}
+        <ReflectionPrompts chapterId={chapter.id} />
 
         {/* Mark Complete */}
         <div className="mt-12 flex flex-col items-center gap-4 rounded-lg border bg-card p-6">
