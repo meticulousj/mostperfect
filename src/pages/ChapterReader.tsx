@@ -7,6 +7,7 @@ import { useProgress } from "@/hooks/useProgress";
 import { getChapterById, getNextChapter, getPreviousChapter, getPartForChapter } from "@/data/bookContent";
 import { cn } from "@/lib/utils";
 import ReflectionPrompts from "@/components/ReflectionPrompts";
+import ChapterNarration from "@/components/ChapterNarration";
 
 const ChapterReader = () => {
   const { chapterId } = useParams<{ chapterId: string }>();
@@ -95,6 +96,17 @@ const ChapterReader = () => {
             </p>
           ))}
         </article>
+
+        {/* Audio Narration */}
+        <ChapterNarration
+          chapterId={chapter.id}
+          title={chapter.title}
+          paragraphs={chapter.content}
+          keyQuote={chapter.keyQuote}
+          onMostlyListened={() => {
+            if (!isCompleted(chapter.id)) toggleChapter(chapter.id);
+          }}
+        />
 
         {/* Reflection Prompts */}
         <ReflectionPrompts chapterId={chapter.id} />
