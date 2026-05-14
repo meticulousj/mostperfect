@@ -31,7 +31,7 @@ const ChapterNarration = ({
   keyQuote,
   onMostlyListened,
 }: ChapterNarrationProps) => {
-  const { getListened, updateListened } = useNarrationProgress();
+  const { getListened, updateListened, getPosition, updatePosition } = useNarrationProgress();
 
   const fullText = useMemo(() => {
     const parts = [title];
