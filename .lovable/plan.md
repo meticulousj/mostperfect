@@ -1,60 +1,39 @@
-## Plan
+## Switch chapter narration to ElevenLabs
 
-Add a lightweight in-app search so readers can quickly find chapters and passages across the book without introducing any backend dependency.
+Replace the browser SpeechSynthesis narration with high-quality ElevenLabs TTS, served through a secure edge function and cached so the same chapter doesn't re-bill on every play.
 
-### What I’ll build
+### How it will work
 
-1. **Create searchable content helpers**
-   - Extend the book content layer with a search utility that indexes the existing local chapter data.
-   - Search across chapter title, description, part title, and body text.
-   - Return structured results with:
-     - chapter ID and title
-     - matching section/part label
-     - a short text excerpt/snippet around the match
-     - simple relevance ordering so title matches appear first
+1. **Edge function `narrate-chapter`** (Lovable Cloud)
+   - Accepts `{ chapterId, text, voiceId? }`
+   - Calls ElevenLabs `/v1/text-to-speech/{voiceId}?output_format=mp3_44100_128` with `eleven_multilingual_v2`
+   - Caches the resulting MP3 in a public Storage bucket `chapter-audio` at `{chapterId}-{voiceId}.mp3`
+   - Returns `{ url }` to the cached file (subsequent calls skip ElevenLabs and return the existing URL)
+   - Uses the existing `ELEVENLABS_API_KEY` secret (will be requested if missing)
 
-2. **Add a global search UI**
-   - Reuse the existing command/dialog components already in the project to create a polished search modal.
-   - Support opening search from:
-     - a new Search button in the top navigation
-     - keyboard shortcut (`/` and/or `Cmd/Ctrl + K`)
-   - Include empty, loading-free, and no-results states.
+2. **Storage bucket `chapter-audio`** (public read, service-role write) created via migration
 
-3. **Connect search results to reading flow**
-   - Each result will link directly to the matching chapter.
-   - Show enough context in results so users understand why a chapter matched.
-   - Keep the UI visually consistent with the project’s current minimal typography and spacing.
+3. **Rewritten `ChapterNarration.tsx`**
+   - Uses a single `<audio>` element instead of `speechSynthesis`
+   - On first Play: shows "Preparing audio…", calls the edge function, then loads & plays the returned MP3
+   - Real progress bar driven by `audio.currentTime / audio.duration`
+   - Play / Pause / Restart / 15s skip back / 15s skip forward
+   - Playback speed picker (0.85× / 1× / 1.15× / 1.35× / 1.6×) via `audio.playbackRate`
+   - Voice picker with 4–5 curated ElevenLabs voices (Sarah, George, Charlotte, Brian, River)
+   - Auto-marks chapter complete at 90% listened (unchanged behavior)
+   - Resume from last position via existing `useNarrationProgress` hook (stores % per chapter)
 
-4. **Improve discoverability on the course page**
-   - Add an inline search entry point on the Course Overview page so users can search from the main reading index as well.
-   - Optionally prefill the global dialog input when launched from that page.
+### Files
 
-5. **Handle usability details**
-   - Debounce/filter input lightly in the client for smooth typing.
-   - Ignore very short queries until the user types enough characters.
-   - Normalize case and punctuation so searches feel forgiving.
+- **New** `supabase/functions/narrate-chapter/index.ts` — TTS + caching
+- **New** migration — create public `chapter-audio` storage bucket + RLS
+- **Edit** `src/components/ChapterNarration.tsx` — swap engine, keep API/props identical so `ChapterReader.tsx` needs no changes
+- **Edit** `src/hooks/useNarrationProgress.ts` — (optional) also store last seconds for resume
 
-### Files likely involved
+### Secret
 
-- `src/data/bookContent.ts` — add reusable search helper(s)
-- `src/components/AppNav.tsx` — add search trigger in navigation
-- `src/pages/CourseOverview.tsx` — add search entry point near the chapter index
-- New component such as `src/components/GlobalSearch.tsx` — search modal and result rendering
-- `src/App.tsx` — mount the global search component if needed
+`ELEVENLABS_API_KEY` — I'll request it via the secrets tool before deploying the function if it isn't already set.
 
-### Technical details
+### Cost note
 
-- No backend required; this will use the existing local content source.
-- I’ll build on top of the existing `cmdk` / dialog UI already present in the codebase.
-- Search ranking will prioritize:
-  1. title matches
-  2. description matches
-  3. part matches
-  4. body text matches
-- Result snippets will be generated from the first relevant body paragraph match to make results more useful than title-only links.
-
-### Outcome
-
-Users will be able to open search from anywhere in the app, type a term like “verification” or “bias,” and jump straight to the relevant chapter with meaningful context.
-
-If you approve, I’ll implement the search modal and wire it into the existing reading experience.
+Each chapter is generated **once** per voice and then served from Storage forever, so ongoing cost is just bandwidth. ~29 chapters × ~5 min × 1 voice ≈ a one-time ~150k characters on ElevenLabs.
