@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Headphones, Loader2, Pause, Play, RotateCcw, SkipBack, SkipForward, Volume2 } from "lucide-react";
+import { Headphones, Pause, Play, RotateCcw, SkipBack, SkipForward, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
 import { useNarrationProgress } from "@/hooks/useNarrationProgress";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/hooks/use-toast";
 
 interface ChapterNarrationProps {
   chapterId: string;
@@ -16,14 +15,6 @@ interface ChapterNarrationProps {
 const RATE_OPTIONS = [0.85, 1, 1.15, 1.35, 1.6];
 const COMPLETE_THRESHOLD = 90;
 
-const VOICES = [
-  { id: "EXAVITQu4vr4xnSDxMaL", name: "Sarah (warm)" },
-  { id: "JBFqnCBsd6RMkjVDRZzb", name: "George (rich)" },
-  { id: "XB0fDUnXU5powFXDhCwa", name: "Charlotte (calm)" },
-  { id: "nPczCjzI2devNBz1zQrb", name: "Brian (deep)" },
-  { id: "SAz9YHcvj6GT2YYXdXww", name: "River (neutral)" },
-];
-
 const ChapterNarration = ({
   chapterId,
   title,
@@ -31,151 +22,200 @@ const ChapterNarration = ({
   keyQuote,
   onMostlyListened,
 }: ChapterNarrationProps) => {
-  const { getListened, updateListened, getPosition, updatePosition } = useNarrationProgress();
+  const { getListened, updateListened } = useNarrationProgress();
 
-  const fullText = useMemo(() => {
-    const parts = [title];
-    if (keyQuote) parts.push(`"${keyQuote}"`);
-    parts.push(...paragraphs);
-    return parts.filter((s) => s && s.trim().length > 0).join("\n\n");
+  const segments = useMemo(() => {
+    const intro = [title];
+    if (keyQuote) intro.push(keyQuote);
+    return [...intro, ...paragraphs].filter((s) => s && s.trim().length > 0);
   }, [title, keyQuote, paragraphs]);
 
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const completeFiredRef = useRef(false);
+  const totalChars = useMemo(
+    () => segments.reduce((sum, s) => sum + s.length, 0),
+    [segments]
+  );
 
-  const [voiceId, setVoiceId] = useState(VOICES[0].id);
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const segmentOffsets = useMemo(() => {
+    const offsets: number[] = [];
+    let acc = 0;
+    for (const s of segments) {
+      offsets.push(acc);
+      acc += s.length;
+    }
+    return offsets;
+  }, [segments]);
+
+  const [supported, setSupported] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [rateIdx, setRateIdx] = useState(1);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [voiceURI, setVoiceURI] = useState<string | null>(null);
+
+  const utterRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const indexRef = useRef(0);
+  const stoppedRef = useRef(false);
+  const completeFiredRef = useRef(false);
 
   const listenedPct = getListened(chapterId);
 
-  // Reset on chapter/voice change
+  useEffect(() => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+      setSupported(false);
+      return;
+    }
+    const load = () => {
+      const list = window.speechSynthesis.getVoices();
+      setVoices(list);
+      if (!voiceURI) {
+        const preferred =
+          list.find((v) => /en[-_]US/i.test(v.lang) && /female|samantha|google us/i.test(v.name)) ||
+          list.find((v) => /^en/i.test(v.lang)) ||
+          list[0];
+        if (preferred) setVoiceURI(preferred.voiceURI);
+      }
+    };
+    load();
+    window.speechSynthesis.onvoiceschanged = load;
+    return () => {
+      window.speechSynthesis.onvoiceschanged = null;
+      window.speechSynthesis.cancel();
+    };
+  }, [voiceURI]);
+
   useEffect(() => {
     completeFiredRef.current = false;
-    setAudioUrl(null);
+    return () => {
+      stoppedRef.current = true;
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, [chapterId]);
+
+  const computePercent = (segIdx: number, charOffset = 0) => {
+    if (totalChars === 0) return 0;
+    const base = segmentOffsets[segIdx] ?? 0;
+    return Math.min(100, ((base + charOffset) / totalChars) * 100);
+  };
+
+  const reportProgress = (segIdx: number, charOffset = 0) => {
+    const pct = computePercent(segIdx, charOffset);
+    updateListened(chapterId, pct);
+    if (!completeFiredRef.current && pct >= COMPLETE_THRESHOLD) {
+      completeFiredRef.current = true;
+      onMostlyListened?.();
+    }
+  };
+
+  const speakFrom = (startIdx: number) => {
+    if (!supported) return;
+    stoppedRef.current = false;
+    indexRef.current = startIdx;
+    setCurrentIndex(startIdx);
+    setIsPlaying(true);
+    setIsPaused(false);
+    window.speechSynthesis.cancel();
+    queueNext();
+  };
+
+  const queueNext = () => {
+    if (stoppedRef.current) return;
+    const i = indexRef.current;
+    if (i >= segments.length) {
+      setIsPlaying(false);
+      setIsPaused(false);
+      reportProgress(segments.length - 1, segments[segments.length - 1]?.length ?? 0);
+      return;
+    }
+    const u = new SpeechSynthesisUtterance(segments[i]);
+    u.rate = RATE_OPTIONS[rateIdx];
+    u.pitch = 1;
+    const v = voices.find((vv) => vv.voiceURI === voiceURI);
+    if (v) u.voice = v;
+    u.onstart = () => reportProgress(i, 0);
+    u.onboundary = (e) => {
+      if (e.name === "word" || e.name === "sentence") {
+        reportProgress(i, e.charIndex ?? 0);
+      }
+    };
+    u.onend = () => {
+      if (stoppedRef.current) return;
+      reportProgress(i, segments[i].length);
+      indexRef.current = i + 1;
+      setCurrentIndex(indexRef.current);
+      queueNext();
+    };
+    u.onerror = () => {
+      if (stoppedRef.current) return;
+      indexRef.current = i + 1;
+      setCurrentIndex(indexRef.current);
+      queueNext();
+    };
+    utterRef.current = u;
+    window.speechSynthesis.speak(u);
+  };
+
+  const handlePlay = () => {
+    if (!supported) return;
+    if (isPaused && window.speechSynthesis.paused) {
+      window.speechSynthesis.resume();
+      setIsPaused(false);
+      setIsPlaying(true);
+      return;
+    }
+    speakFrom(currentIndex);
+  };
+
+  const handlePause = () => {
+    if (!supported) return;
+    window.speechSynthesis.pause();
+    setIsPaused(true);
     setIsPlaying(false);
-    setCurrentTime(0);
-    setDuration(0);
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
-    }
-  }, [chapterId, voiceId]);
-
-  const ensureAudio = async (): Promise<string | null> => {
-    if (audioUrl) return audioUrl;
-    setLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("narrate-chapter", {
-        body: { chapterId, text: fullText, voiceId },
-      });
-      if (error) throw error;
-      if (!data?.url) throw new Error("No audio URL returned");
-      setAudioUrl(data.url);
-      return data.url as string;
-    } catch (e) {
-      toast({
-        title: "Couldn't generate narration",
-        description: (e as Error).message,
-        variant: "destructive",
-      });
-      return null;
-    } finally {
-      setLoading(false);
-    }
   };
 
-  const handlePlay = async () => {
-    const url = await ensureAudio();
-    if (!url) return;
-
-    if (!audioRef.current) {
-      const a = new Audio(url);
-      a.playbackRate = RATE_OPTIONS[rateIdx];
-      let lastSaved = 0;
-      a.addEventListener("timeupdate", () => {
-        setCurrentTime(a.currentTime);
-        // Persist position at most once per second
-        if (Math.abs(a.currentTime - lastSaved) >= 1) {
-          lastSaved = a.currentTime;
-          updatePosition(chapterId, a.currentTime);
-        }
-        if (a.duration > 0) {
-          const pct = (a.currentTime / a.duration) * 100;
-          updateListened(chapterId, pct);
-          if (!completeFiredRef.current && pct >= COMPLETE_THRESHOLD) {
-            completeFiredRef.current = true;
-            onMostlyListened?.();
-          }
-        }
-      });
-      a.addEventListener("loadedmetadata", () => {
-        setDuration(a.duration);
-        // Resume from last saved position (if not at the very end)
-        const saved = getPosition(chapterId);
-        if (saved > 0 && saved < a.duration - 2) {
-          a.currentTime = saved;
-          setCurrentTime(saved);
-        }
-      });
-      a.addEventListener("ended", () => {
-        setIsPlaying(false);
-        updatePosition(chapterId, 0);
-      });
-      a.addEventListener("pause", () => {
-        setIsPlaying(false);
-        updatePosition(chapterId, a.currentTime);
-      });
-      a.addEventListener("play", () => setIsPlaying(true));
-      audioRef.current = a;
-    }
-    audioRef.current.playbackRate = RATE_OPTIONS[rateIdx];
-    await audioRef.current.play();
+  const handleStop = () => {
+    if (!supported) return;
+    stoppedRef.current = true;
+    window.speechSynthesis.cancel();
+    setIsPlaying(false);
+    setIsPaused(false);
+    setCurrentIndex(0);
+    indexRef.current = 0;
   };
 
-  const handlePause = () => audioRef.current?.pause();
-
-  const handleRestart = () => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = 0;
-      setCurrentTime(0);
-      updatePosition(chapterId, 0);
+  const skip = (delta: number) => {
+    const next = Math.max(0, Math.min(segments.length - 1, currentIndex + delta));
+    if (isPlaying || isPaused) {
+      speakFrom(next);
+    } else {
+      setCurrentIndex(next);
+      indexRef.current = next;
     }
-  };
-
-  const skip = (seconds: number) => {
-    if (!audioRef.current) return;
-    audioRef.current.currentTime = Math.max(
-      0,
-      Math.min(audioRef.current.duration || 0, audioRef.current.currentTime + seconds),
-    );
   };
 
   const cycleRate = () => {
-    const next = (rateIdx + 1) % RATE_OPTIONS.length;
-    setRateIdx(next);
-    if (audioRef.current) audioRef.current.playbackRate = RATE_OPTIONS[next];
+    const nextIdx = (rateIdx + 1) % RATE_OPTIONS.length;
+    setRateIdx(nextIdx);
+    if (isPlaying) {
+      speakFrom(indexRef.current);
+    }
   };
 
-  useEffect(() => {
-    return () => {
-      audioRef.current?.pause();
-    };
-  }, []);
+  if (!supported) {
+    return (
+      <section className="mt-10 rounded-lg border bg-card p-6">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Headphones className="h-4 w-4" />
+          Audio narration isn't supported in this browser. Try Chrome, Edge, or Safari.
+        </div>
+      </section>
+    );
+  }
 
-  const livePct = duration > 0 ? (currentTime / duration) * 100 : 0;
-  const displayPct = Math.max(listenedPct, livePct);
-
-  const fmt = (s: number) => {
-    if (!isFinite(s)) return "0:00";
-    const m = Math.floor(s / 60);
-    const sec = Math.floor(s % 60).toString().padStart(2, "0");
-    return `${m}:${sec}`;
-  };
+  const livePct = computePercent(currentIndex, 0);
+  const displayPct = Math.max(listenedPct, isPlaying || isPaused ? livePct : 0);
 
   return (
     <section className="mt-10 rounded-lg border bg-card p-6 sm:p-7">
@@ -191,19 +231,15 @@ const ChapterNarration = ({
         </span>
       </header>
 
-      <div className="mb-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+      <div className="mb-5 h-1.5 w-full overflow-hidden rounded-full bg-muted">
         <div
           className="h-full bg-primary transition-all duration-300"
           style={{ width: `${displayPct}%` }}
         />
       </div>
-      <div className="mb-5 flex justify-between text-xs text-muted-foreground">
-        <span>{fmt(currentTime)}</span>
-        <span>{duration > 0 ? fmt(duration) : "—"}</span>
-      </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <Button variant="ghost" size="icon" onClick={() => skip(-15)} aria-label="Back 15s" disabled={!audioRef.current}>
+        <Button variant="ghost" size="icon" onClick={() => skip(-1)} aria-label="Previous segment">
           <SkipBack className="h-4 w-4" />
         </Button>
 
@@ -212,21 +248,13 @@ const ChapterNarration = ({
             <Pause className="h-4 w-4" /> Pause
           </Button>
         ) : (
-          <Button onClick={handlePlay} size="lg" className="gap-2" disabled={loading}>
-            {loading ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" /> Preparing audio…
-              </>
-            ) : (
-              <>
-                <Play className="h-4 w-4" />
-                {currentTime > 0 ? "Resume" : "Play"}
-              </>
-            )}
+          <Button onClick={handlePlay} size="lg" className="gap-2">
+            <Play className="h-4 w-4" />
+            {isPaused ? "Resume" : currentIndex > 0 ? "Continue" : "Play"}
           </Button>
         )}
 
-        <Button variant="ghost" size="icon" onClick={() => skip(15)} aria-label="Forward 15s" disabled={!audioRef.current}>
+        <Button variant="ghost" size="icon" onClick={() => skip(1)} aria-label="Next segment">
           <SkipForward className="h-4 w-4" />
         </Button>
 
@@ -237,35 +265,46 @@ const ChapterNarration = ({
         <Button
           variant="ghost"
           size="sm"
-          onClick={handleRestart}
-          disabled={!audioRef.current || currentTime === 0}
+          onClick={handleStop}
+          disabled={!isPlaying && !isPaused && currentIndex === 0}
           className="gap-1"
         >
           <RotateCcw className="h-3.5 w-3.5" />
           Restart
         </Button>
+
+        <span className="ml-auto text-xs text-muted-foreground">
+          Segment {Math.min(currentIndex + 1, segments.length)} / {segments.length}
+        </span>
       </div>
 
-      <div className="mt-4 flex items-center gap-2">
-        <Volume2 className="h-3.5 w-3.5 text-muted-foreground" />
-        <select
-          value={voiceId}
-          onChange={(e) => setVoiceId(e.target.value)}
-          className="max-w-full truncate rounded-md border bg-background px-2 py-1 text-xs text-foreground"
-        >
-          {VOICES.map((v) => (
-            <option key={v.id} value={v.id}>
-              {v.name}
-            </option>
-          ))}
-        </select>
-      </div>
+      {voices.length > 0 && (
+        <div className="mt-4 flex items-center gap-2">
+          <Volume2 className="h-3.5 w-3.5 text-muted-foreground" />
+          <select
+            value={voiceURI ?? ""}
+            onChange={(e) => setVoiceURI(e.target.value)}
+            className="max-w-full truncate rounded-md border bg-background px-2 py-1 text-xs text-foreground"
+          >
+            {voices
+              .filter((v) => /^en/i.test(v.lang))
+              .map((v) => (
+                <option key={v.voiceURI} value={v.voiceURI}>
+                  {v.name} ({v.lang})
+                </option>
+              ))}
+          </select>
+        </div>
+      )}
 
       <p className="mt-4 text-xs text-muted-foreground">
-        High-quality narration powered by ElevenLabs. The first play generates the audio (a few
-        seconds); subsequent plays stream the cached file. Chapter is marked complete automatically
-        once you've listened to {COMPLETE_THRESHOLD}%.
+        Uses your browser's built-in voice. Chapter is marked complete automatically once you've
+        listened to {COMPLETE_THRESHOLD}%.
       </p>
+
+      <div className="hidden">
+        <Slider value={[0]} max={100} />
+      </div>
     </section>
   );
 };
