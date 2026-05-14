@@ -96,8 +96,14 @@ const ChapterNarration = ({
     if (!audioRef.current) {
       const a = new Audio(url);
       a.playbackRate = RATE_OPTIONS[rateIdx];
+      let lastSaved = 0;
       a.addEventListener("timeupdate", () => {
         setCurrentTime(a.currentTime);
+        // Persist position at most once per second
+        if (Math.abs(a.currentTime - lastSaved) >= 1) {
+          lastSaved = a.currentTime;
+          updatePosition(chapterId, a.currentTime);
+        }
         if (a.duration > 0) {
           const pct = (a.currentTime / a.duration) * 100;
           updateListened(chapterId, pct);
@@ -107,9 +113,23 @@ const ChapterNarration = ({
           }
         }
       });
-      a.addEventListener("loadedmetadata", () => setDuration(a.duration));
-      a.addEventListener("ended", () => setIsPlaying(false));
-      a.addEventListener("pause", () => setIsPlaying(false));
+      a.addEventListener("loadedmetadata", () => {
+        setDuration(a.duration);
+        // Resume from last saved position (if not at the very end)
+        const saved = getPosition(chapterId);
+        if (saved > 0 && saved < a.duration - 2) {
+          a.currentTime = saved;
+          setCurrentTime(saved);
+        }
+      });
+      a.addEventListener("ended", () => {
+        setIsPlaying(false);
+        updatePosition(chapterId, 0);
+      });
+      a.addEventListener("pause", () => {
+        setIsPlaying(false);
+        updatePosition(chapterId, a.currentTime);
+      });
       a.addEventListener("play", () => setIsPlaying(true));
       audioRef.current = a;
     }
@@ -123,6 +143,7 @@ const ChapterNarration = ({
     if (audioRef.current) {
       audioRef.current.currentTime = 0;
       setCurrentTime(0);
+      updatePosition(chapterId, 0);
     }
   };
 
