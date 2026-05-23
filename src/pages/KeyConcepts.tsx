@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight, Scale, Brain, ShieldCheck, Sparkles, Eye, Flame, Target, Gem, Heart, Crown } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import SEO from "@/components/SEO";
 
 const laws = [
   { icon: Eye, title: "The Law of Verification", desc: "Submit every belief and decision to the test of evidence." },
