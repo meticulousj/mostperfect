@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Download, FileText, ClipboardCheck, Compass, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { bookParts } from "@/data/bookContent";
+import SEO from "@/components/SEO";
 
 const workbookMeta: Record<string, { essence: string }> = {
   "part-1": {
