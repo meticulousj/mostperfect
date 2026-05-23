@@ -34,6 +34,11 @@ const workbookMeta: Record<string, { essence: string }> = {
 const Workbooks = () => {
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Workbooks — Most Perfect Practice Guides"
+        description="Downloadable PDF workbooks for each part of Most Perfect. Practice the principles, verify your beliefs, and refine your identity."
+        path="/workbooks"
+      />
       <section className="border-b">
         <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
           <motion.div
