@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useProgress } from "@/hooks/useProgress";
 import { bookParts, allChapters } from "@/data/bookContent";
+import SEO from "@/components/SEO";
 
 const ProgressDashboard = () => {
   const { overallPercentage, completedCount, totalChapters, getPartProgress, progress, isCompleted, resetProgress } = useProgress();
@@ -13,6 +14,11 @@ const ProgressDashboard = () => {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
+      <SEO
+        title="Your Progress — Most Perfect"
+        description="Track your journey through Most Perfect. See completion across all 6 parts and resume where you left off."
+        path="/progress"
+      />
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="font-serif text-3xl font-bold text-foreground">Your Progress</h1>
         <p className="mt-2 text-muted-foreground">Track your journey through the book.</p>

@@ -8,6 +8,7 @@ import { getChapterById, getNextChapter, getPreviousChapter, getPartForChapter }
 import { cn } from "@/lib/utils";
 import ReflectionPrompts from "@/components/ReflectionPrompts";
 import ChapterNarration from "@/components/ChapterNarration";
+import SEO from "@/components/SEO";
 
 const ChapterReader = () => {
   const { chapterId } = useParams<{ chapterId: string }>();
@@ -38,8 +39,38 @@ const ChapterReader = () => {
 
   const completed = isCompleted(chapter.id);
 
+  const chapterLabel = typeof chapter.number === "number" ? `Chapter ${chapter.number}` : chapter.number;
+  const seoTitle = `${chapter.title} — ${chapterLabel} | Most Perfect`.slice(0, 60);
+  const seoDescription = chapter.description.slice(0, 158);
+  const articleLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: chapter.title,
+    description: chapter.description,
+    articleSection: part ? `Part ${part.number} — ${part.title}` : chapterLabel,
+    author: { "@type": "Person", name: "Jessica Butler" },
+    publisher: { "@type": "Organization", name: "Most Perfect" },
+    mainEntityOfPage: `https://mostperfect.lovable.app/read/${chapter.id}`,
+  };
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Course", item: "https://mostperfect.lovable.app/course" },
+      ...(part ? [{ "@type": "ListItem", position: 2, name: `Part ${part.number}: ${part.title}`, item: "https://mostperfect.lovable.app/course" }] : []),
+      { "@type": "ListItem", position: part ? 3 : 2, name: chapter.title, item: `https://mostperfect.lovable.app/read/${chapter.id}` },
+    ],
+  };
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-12">
+      <SEO
+        title={seoTitle}
+        description={seoDescription}
+        path={`/read/${chapter.id}`}
+        type="article"
+        jsonLd={[articleLd, breadcrumbLd]}
+      />
       <motion.div
         key={chapter.id}
         initial={{ opacity: 0, y: 12 }}
