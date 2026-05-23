@@ -26,6 +26,12 @@ const closingParagraphs = [
 const AuthorsNote = () => {
   return (
     <div className="min-h-screen">
+      <SEO
+        title="Author's Note — Most Perfect by Jessica Butler"
+        description="The origin and intent behind Most Perfect: a reliable operating system for clarity, resilience, leadership, and personal excellence."
+        path="/authors-note"
+        type="article"
+      />
       <article className="mx-auto max-w-3xl px-4 py-16 sm:px-6 sm:py-20">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
