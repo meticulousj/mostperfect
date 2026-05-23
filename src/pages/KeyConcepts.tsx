@@ -38,6 +38,11 @@ const coreConcepts = [
 const KeyConcepts = () => {
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
+      <SEO
+        title="Key Concepts — The 10 Laws & Three Pillars | Most Perfect"
+        description="The 10 Laws of the Proven Life and the Three Pillars of the Above Human path. Core principles distilled from Most Perfect."
+        path="/concepts"
+      />
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="font-serif text-3xl font-bold text-foreground">Key Concepts</h1>
         <p className="mt-2 text-muted-foreground">
