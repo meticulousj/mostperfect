@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import SEO from "@/components/SEO";
 
 const paragraphs = [
   "This book was born from a single, persistent question: How does a person rise above the limits that quietly shape their life?",
