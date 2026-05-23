@@ -8,12 +8,18 @@ import { useProgress } from "@/hooks/useProgress";
 import { bookParts, PROLOGUE, EPILOGUE } from "@/data/bookContent";
 import { cn } from "@/lib/utils";
 import { openGlobalSearch } from "@/components/GlobalSearch";
+import SEO from "@/components/SEO";
 
 const CourseOverview = () => {
   const { isCompleted, getPartProgress } = useProgress();
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
+      <SEO
+        title="Course Overview — Most Perfect"
+        description="Browse all 6 parts and 29 chapters of Most Perfect. Start anywhere, track completion, and build your Above Human standard."
+        path="/course"
+      />
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
