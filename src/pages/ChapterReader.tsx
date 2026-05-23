@@ -8,6 +8,7 @@ import { getChapterById, getNextChapter, getPreviousChapter, getPartForChapter }
 import { cn } from "@/lib/utils";
 import ReflectionPrompts from "@/components/ReflectionPrompts";
 import ChapterNarration from "@/components/ChapterNarration";
+import SEO from "@/components/SEO";
 
 const ChapterReader = () => {
   const { chapterId } = useParams<{ chapterId: string }>();
