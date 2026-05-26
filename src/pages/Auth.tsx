@@ -58,7 +58,7 @@ const AuthPage = () => {
       <SEO
         title="Sign in · Most Perfect"
         description="Sign in to sync your reading progress, reflections, and narration across devices."
-        canonical={`${window.location.origin}/auth`}
+        path="/auth"
       />
       <div className="mb-8 text-center">
         <h1 className="font-serif text-3xl tracking-tight">Welcome</h1>
