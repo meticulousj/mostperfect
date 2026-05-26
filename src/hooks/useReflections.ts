@@ -59,6 +59,13 @@ export const useReflections = () => {
     save(reflections);
   }, [reflections]);
 
+  useEffect(() => {
+    const handler = () => setReflections(getStored());
+    window.addEventListener(CLOUD_HYDRATE_EVENT, handler);
+    return () => window.removeEventListener(CLOUD_HYDRATE_EVENT, handler);
+  }, []);
+
+
   const getReflection = useCallback(
     (key: string) => reflections[key] ?? "",
     [reflections]
