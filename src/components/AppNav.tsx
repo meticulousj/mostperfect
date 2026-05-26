@@ -93,6 +93,7 @@ const AppNav = () => {
             <Search className="h-4 w-4" />
             Search
           </Button>
+          {authControl}
           {themeToggle}
         </div>
 
