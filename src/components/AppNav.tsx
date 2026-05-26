@@ -1,10 +1,12 @@
 import { Link, useLocation } from "react-router-dom";
-import { BookOpen, LayoutGrid, BarChart3, Lightbulb, PenLine, FileText, Menu, X, Moon, Sun, Search } from "lucide-react";
+import { BookOpen, LayoutGrid, BarChart3, Lightbulb, PenLine, FileText, Menu, X, Moon, Sun, Search, LogIn, LogOut } from "lucide-react";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { openGlobalSearch } from "@/components/GlobalSearch";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
 const navItems = [
   { to: "/", label: "Home", icon: BookOpen },
@@ -17,11 +19,32 @@ const navItems = [
 
 const AppNav = () => {
   const location = useLocation();
+  const { user, signOut } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isDark, setIsDark] = useState(() => {
     if (typeof window === "undefined") return false;
     return localStorage.getItem("theme") === "dark";
   });
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast.success("Signed out");
+  };
+
+  const authControl = user ? (
+    <Button variant="ghost" size="sm" onClick={handleSignOut} className="gap-1.5 text-muted-foreground hover:text-accent-foreground">
+      <LogOut className="h-4 w-4" />
+      Sign out
+    </Button>
+  ) : (
+    <Button asChild variant="ghost" size="sm" className="gap-1.5 text-muted-foreground hover:text-accent-foreground">
+      <Link to="/auth">
+        <LogIn className="h-4 w-4" />
+        Sign in
+      </Link>
+    </Button>
+  );
+
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", isDark);
@@ -70,6 +93,7 @@ const AppNav = () => {
             <Search className="h-4 w-4" />
             Search
           </Button>
+          {authControl}
           {themeToggle}
         </div>
 
@@ -111,6 +135,26 @@ const AppNav = () => {
             <Search className="h-4 w-4" />
             Search
           </button>
+          <div className="mt-2 border-t pt-3">
+            {user ? (
+              <button
+                onClick={() => { setMobileOpen(false); handleSignOut(); }}
+                className="flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+              >
+                <LogOut className="h-4 w-4" />
+                Sign out
+              </button>
+            ) : (
+              <Link
+                to="/auth"
+                onClick={() => setMobileOpen(false)}
+                className="flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+              >
+                <LogIn className="h-4 w-4" />
+                Sign in
+              </Link>
+            )}
+          </div>
           <div className="mt-2 border-t pt-3">{themeToggle}</div>
         </div>
       )}

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { CLOUD_HYDRATE_EVENT, PROGRESS_CHANGED_EVENT } from "@/hooks/useCloudSync";
 
 const STORAGE_KEY = "mostperfect-reflections";
 
@@ -14,6 +15,7 @@ const getStored = (): ReflectionsMap => {
 
 const save = (data: ReflectionsMap) => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  window.dispatchEvent(new Event(PROGRESS_CHANGED_EVENT));
 };
 
 /**
@@ -56,6 +58,13 @@ export const useReflections = () => {
   useEffect(() => {
     save(reflections);
   }, [reflections]);
+
+  useEffect(() => {
+    const handler = () => setReflections(getStored());
+    window.addEventListener(CLOUD_HYDRATE_EVENT, handler);
+    return () => window.removeEventListener(CLOUD_HYDRATE_EVENT, handler);
+  }, []);
+
 
   const getReflection = useCallback(
     (key: string) => reflections[key] ?? "",

@@ -12,7 +12,9 @@ import ProgressDashboard from "./pages/ProgressDashboard.tsx";
 import KeyConcepts from "./pages/KeyConcepts.tsx";
 import AuthorsNote from "./pages/AuthorsNote.tsx";
 import Workbooks from "./pages/Workbooks.tsx";
+import Auth from "./pages/Auth.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import CloudSyncProvider from "@/components/CloudSyncProvider";
 
 const queryClient = new QueryClient();
 
@@ -22,18 +24,21 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <AppNav />
-        <GlobalSearch />
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/course" element={<CourseOverview />} />
-          <Route path="/read/:chapterId" element={<ChapterReader />} />
-          <Route path="/progress" element={<ProgressDashboard />} />
-          <Route path="/concepts" element={<KeyConcepts />} />
-          <Route path="/authors-note" element={<AuthorsNote />} />
-          <Route path="/workbooks" element={<Workbooks />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <CloudSyncProvider>
+          <AppNav />
+          <GlobalSearch />
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/course" element={<CourseOverview />} />
+            <Route path="/read/:chapterId" element={<ChapterReader />} />
+            <Route path="/progress" element={<ProgressDashboard />} />
+            <Route path="/concepts" element={<KeyConcepts />} />
+            <Route path="/authors-note" element={<AuthorsNote />} />
+            <Route path="/workbooks" element={<Workbooks />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </CloudSyncProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

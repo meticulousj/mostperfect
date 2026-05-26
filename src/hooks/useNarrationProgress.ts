@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
+import { CLOUD_HYDRATE_EVENT, PROGRESS_CHANGED_EVENT } from "@/hooks/useCloudSync";
 
 const STORAGE_KEY = "mostperfect-narration";
 
 interface NarrationData {
-  // chapterId -> percent listened (0-100, highest reached)
   listened: Record<string, number>;
 }
 
@@ -17,6 +17,7 @@ const getStored = (): NarrationData => {
 
 const save = (data: NarrationData) => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  window.dispatchEvent(new Event(PROGRESS_CHANGED_EVENT));
 };
 
 export const useNarrationProgress = () => {
@@ -25,6 +26,12 @@ export const useNarrationProgress = () => {
   useEffect(() => {
     save(data);
   }, [data]);
+
+  useEffect(() => {
+    const handler = () => setData(getStored());
+    window.addEventListener(CLOUD_HYDRATE_EVENT, handler);
+    return () => window.removeEventListener(CLOUD_HYDRATE_EVENT, handler);
+  }, []);
 
   const getListened = useCallback(
     (chapterId: string) => data.listened[chapterId] ?? 0,

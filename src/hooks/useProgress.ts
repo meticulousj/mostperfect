@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { allChapters } from "@/data/bookContent";
+import { CLOUD_HYDRATE_EVENT, PROGRESS_CHANGED_EVENT } from "@/hooks/useCloudSync";
 
 const STORAGE_KEY = "mostperfect-progress";
 
@@ -19,6 +20,7 @@ const getStoredProgress = (): ProgressData => {
 
 const saveProgress = (data: ProgressData) => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  window.dispatchEvent(new Event(PROGRESS_CHANGED_EVENT));
 };
 
 export const useProgress = () => {
@@ -27,6 +29,12 @@ export const useProgress = () => {
   useEffect(() => {
     saveProgress(progress);
   }, [progress]);
+
+  useEffect(() => {
+    const handler = () => setProgress(getStoredProgress());
+    window.addEventListener(CLOUD_HYDRATE_EVENT, handler);
+    return () => window.removeEventListener(CLOUD_HYDRATE_EVENT, handler);
+  }, []);
 
   const toggleChapter = useCallback((chapterId: string) => {
     setProgress((prev) => {
