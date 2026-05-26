@@ -135,6 +135,26 @@ const AppNav = () => {
             <Search className="h-4 w-4" />
             Search
           </button>
+          <div className="mt-2 border-t pt-3">
+            {user ? (
+              <button
+                onClick={() => { setMobileOpen(false); handleSignOut(); }}
+                className="flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+              >
+                <LogOut className="h-4 w-4" />
+                Sign out
+              </button>
+            ) : (
+              <Link
+                to="/auth"
+                onClick={() => setMobileOpen(false)}
+                className="flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+              >
+                <LogIn className="h-4 w-4" />
+                Sign in
+              </Link>
+            )}
+          </div>
           <div className="mt-2 border-t pt-3">{themeToggle}</div>
         </div>
       )}
