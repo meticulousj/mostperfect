@@ -1,10 +1,12 @@
 import { Link, useLocation } from "react-router-dom";
-import { BookOpen, LayoutGrid, BarChart3, Lightbulb, PenLine, FileText, Menu, X, Moon, Sun, Search } from "lucide-react";
+import { BookOpen, LayoutGrid, BarChart3, Lightbulb, PenLine, FileText, Menu, X, Moon, Sun, Search, LogIn, LogOut } from "lucide-react";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { openGlobalSearch } from "@/components/GlobalSearch";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
 const navItems = [
   { to: "/", label: "Home", icon: BookOpen },
