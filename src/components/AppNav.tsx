@@ -19,11 +19,32 @@ const navItems = [
 
 const AppNav = () => {
   const location = useLocation();
+  const { user, signOut } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isDark, setIsDark] = useState(() => {
     if (typeof window === "undefined") return false;
     return localStorage.getItem("theme") === "dark";
   });
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast.success("Signed out");
+  };
+
+  const authControl = user ? (
+    <Button variant="ghost" size="sm" onClick={handleSignOut} className="gap-1.5 text-muted-foreground hover:text-accent-foreground">
+      <LogOut className="h-4 w-4" />
+      Sign out
+    </Button>
+  ) : (
+    <Button asChild variant="ghost" size="sm" className="gap-1.5 text-muted-foreground hover:text-accent-foreground">
+      <Link to="/auth">
+        <LogIn className="h-4 w-4" />
+        Sign in
+      </Link>
+    </Button>
+  );
+
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", isDark);
