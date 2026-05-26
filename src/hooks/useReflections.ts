@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { CLOUD_HYDRATE_EVENT, PROGRESS_CHANGED_EVENT } from "@/hooks/useCloudSync";
 
 const STORAGE_KEY = "mostperfect-reflections";
 
@@ -14,6 +15,7 @@ const getStored = (): ReflectionsMap => {
 
 const save = (data: ReflectionsMap) => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  window.dispatchEvent(new Event(PROGRESS_CHANGED_EVENT));
 };
 
 /**
