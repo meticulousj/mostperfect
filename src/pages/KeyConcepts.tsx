@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Scale, Brain, ShieldCheck, Sparkles, Eye, Flame, Target, Gem, Heart, Crown } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import SEO from "@/components/SEO";
+import PremiumGate from "@/components/PremiumGate";
 
 const laws = [
   { icon: Eye, title: "The Law of Verification", desc: "Submit every belief and decision to the test of evidence." },
@@ -43,6 +44,10 @@ const KeyConcepts = () => {
         description="The 10 Laws of the Proven Life and the Three Pillars of the Above Human path. Core principles distilled from Most Perfect."
         path="/concepts"
       />
+      <PremiumGate
+        title="Unlock Key Concepts"
+        description="Premium access reveals the full 10 Laws, Three Pillars, and the Manifesto — plus all six workbooks."
+      >
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="font-serif text-3xl font-bold text-foreground">Key Concepts</h1>
         <p className="mt-2 text-muted-foreground">
@@ -115,6 +120,7 @@ const KeyConcepts = () => {
           Read the full Manifesto <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </section>
+      </PremiumGate>
     </div>
   );
 };

@@ -3,6 +3,7 @@ import { Download, FileText, ClipboardCheck, Compass, Target } from "lucide-reac
 import { Button } from "@/components/ui/button";
 import { bookParts } from "@/data/bookContent";
 import SEO from "@/components/SEO";
+import PremiumGate from "@/components/PremiumGate";
 
 const workbookMeta: Record<string, { essence: string }> = {
   "part-1": {
@@ -39,6 +40,10 @@ const Workbooks = () => {
         description="Downloadable PDF workbooks for each part of Most Perfect. Practice the principles, verify your beliefs, and refine your identity."
         path="/workbooks"
       />
+      <PremiumGate
+        title="Unlock the Workbooks"
+        description="Get lifetime access to all six part workbooks plus the full Key Concepts library."
+      >
       <section className="border-b">
         <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
           <motion.div
@@ -144,6 +149,7 @@ const Workbooks = () => {
           </Button>
         </div>
       </section>
+      </PremiumGate>
     </div>
   );
 };
