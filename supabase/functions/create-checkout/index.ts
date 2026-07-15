@@ -52,6 +52,7 @@ Deno.serve(async (req) => {
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
       mode: "payment",
+      payment_method_types: ["card"],
       line_items: [
         {
           price_data: {
