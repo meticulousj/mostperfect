@@ -6,6 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { useProgress } from "@/hooks/useProgress";
 import { bookParts, PROLOGUE } from "@/data/bookContent";
 import SEO from "@/components/SEO";
+import AutoResume from "@/components/AutoResume";
 
 const Index = () => {
   const { overallPercentage, completedCount, totalChapters, progress } = useProgress();
@@ -13,6 +14,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen">
+      <AutoResume />
       <SEO
         title="Most Perfect — Above Human, Proven and Verified"
         description="An interactive guide to the book Most Perfect. Read 29 chapters, track progress, capture reflections, and live the 10 Laws of the Proven Life."
