@@ -6,6 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { useProgress } from "@/hooks/useProgress";
 import { bookParts, PROLOGUE } from "@/data/bookContent";
 import SEO from "@/components/SEO";
+import AutoResume from "@/components/AutoResume";
 
 const Index = () => {
   const { overallPercentage, completedCount, totalChapters, progress } = useProgress();
