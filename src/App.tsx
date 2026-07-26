@@ -15,6 +15,7 @@ import Workbooks from "./pages/Workbooks.tsx";
 import Auth from "./pages/Auth.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import CloudSyncProvider from "@/components/CloudSyncProvider";
+import WelcomeTour from "@/components/WelcomeTour";
 
 const queryClient = new QueryClient();
 
