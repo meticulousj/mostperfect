@@ -28,6 +28,7 @@ const App = () => (
         <CloudSyncProvider>
           <AppNav />
           <GlobalSearch />
+          <WelcomeTour />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/course" element={<CourseOverview />} />
