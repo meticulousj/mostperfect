@@ -52,20 +52,22 @@ const AutoResume = () => {
 
       sessionStorage.setItem(SESSION_FLAG, "1");
 
+      let cancelled = false;
       const pace = paceLabel(prefs.goal);
       toast(`Resuming: ${chapter.title}`, {
         description: pace ?? "Picking up where you left off.",
         icon: <BookOpen className="h-4 w-4" />,
         action: {
-          label: "Stay on home",
+          label: "Stay here",
           onClick: () => {
-            /* no-op — user already on home */
+            cancelled = true;
           },
         },
       });
 
-      // Small delay so the toast is visible before route change
-      const t = setTimeout(() => navigate(`/read/${chapter.id}`), 900);
+      const t = setTimeout(() => {
+        if (!cancelled) navigate(`/read/${chapter.id}`);
+      }, 1200);
       return () => clearTimeout(t);
     } catch {
       // ignore
