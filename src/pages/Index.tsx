@@ -14,6 +14,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen">
+      <AutoResume />
       <SEO
         title="Most Perfect — Above Human, Proven and Verified"
         description="An interactive guide to the book Most Perfect. Read 29 chapters, track progress, capture reflections, and live the 10 Laws of the Proven Life."
