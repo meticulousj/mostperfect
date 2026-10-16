@@ -1,14 +1,40 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, BookOpen, RotateCcw } from "lucide-react";
+import { ArrowRight, BookOpen, RotateCcw, Gauge } from "lucide-react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useProgress } from "@/hooks/useProgress";
 import { bookParts, allChapters } from "@/data/bookContent";
 import SEO from "@/components/SEO";
 
+const PREFS_KEY = "mostperfect-onboarding-prefs";
+
+const paceOptions = [
+  { value: 1, label: "Casual", desc: "1 chapter / week" },
+  { value: 3, label: "Steady", desc: "3 chapters / week" },
+  { value: 7, label: "Immersed", desc: "1 chapter / day" },
+];
+
+const readPrefs = (): { goal?: number } => {
+  try {
+    const raw = localStorage.getItem(PREFS_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+};
+
 const ProgressDashboard = () => {
   const { overallPercentage, completedCount, totalChapters, getPartProgress, progress, isCompleted, resetProgress } = useProgress();
+  const [goal, setGoal] = useState<number>(() => readPrefs().goal ?? 3);
+
+  useEffect(() => {
+    try {
+      const prefs = readPrefs();
+      localStorage.setItem(PREFS_KEY, JSON.stringify({ ...prefs, goal }));
+    } catch {}
+  }, [goal]);
 
   const continueChapter = progress.lastReadChapter || "prologue";
 

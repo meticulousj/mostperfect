@@ -1,12 +1,13 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, BookOpen, ChevronRight, Mail, Download, Sparkles } from "lucide-react";
+import { ArrowRight, BookOpen, ChevronRight, Mail, Download, Sparkles, PlayCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useProgress } from "@/hooks/useProgress";
 import { bookParts, PROLOGUE } from "@/data/bookContent";
 import SEO from "@/components/SEO";
 import AutoResume from "@/components/AutoResume";
+import howItWorksVideo from "@/assets/how-it-works.mp4";
 
 const Index = () => {
   const { overallPercentage, completedCount, totalChapters, progress } = useProgress();
